@@ -41,6 +41,7 @@
           {% endif %}
             <hr>
             {% if comments %}
+            <div>
               <ul class="commentList">
                 {% for comment in comments %}
                 {% if comment.post_id == post.id %}
@@ -56,6 +57,7 @@
                 {% endif %}
                 {% endfor %}
               </ul>
+            </div>
             {% endif %}
             </div>
 
