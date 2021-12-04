@@ -12,7 +12,6 @@ from functools import wraps
 from sqlalchemy import Table, Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.dialects import postgresql
 import os
 
 
