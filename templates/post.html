@@ -41,23 +41,23 @@
           {% endif %}
             <hr>
             {% if comments %}
-            <div>
               <ul class="commentList">
                 {% for comment in comments %}
                 {% if comment.post_id == post.id %}
-                <li>
-                    <div class="commenterImage">
-                      <img src="https://pbs.twimg.com/profile_images/744849215675838464/IH0FNIXk.jpg"/>
-                    </div>
-                    <div class="commentText">
-                      <p>{{ comment.text|safe }}</p>
-                      <span class="date sub-text">{{ comment.comment_author.name.title() }}</span>
-                    </div>
-                </li>
+                <div>
+                  <li>
+                      <div class="commenterImage">
+                        <img src="https://pbs.twimg.com/profile_images/744849215675838464/IH0FNIXk.jpg"/>
+                      </div>
+                      <div class="commentText">
+                        <p>{{ comment.text|safe }}</p>
+                        <span class="date sub-text">{{ comment.comment_author.name.title() }}</span>
+                      </div>
+                  </li>
+                </div>
                 {% endif %}
                 {% endfor %}
               </ul>
-            </div>
             {% endif %}
             </div>
 
