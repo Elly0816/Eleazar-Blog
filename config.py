@@ -3,6 +3,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SECRET_KEY = os.environ.get('SECRET_KEY')
-DATABASE_URL = os.environ.get('DATABASE_URL')
-DATABASE_URL1 = os.environ.get('DATABASE_URL1')
+SECRET_KEY = os.getenv('SECRET_KEY')
+DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///blog.db')
+DATABASE_URL1 = os.getenv('DATABASE_URL1', 'sqlite:///blog.db')
