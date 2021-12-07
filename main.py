@@ -21,11 +21,20 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = config.SECRET_KEY
 ckeditor = CKEditor(app)
 Bootstrap(app)
+gravatar = Gravatar(app,
+                    size=10,
+                    rating='g',
+                    default='retro',
+                    force_default=False,
+                    force_lower=False,
+                    use_ssl=False,
+                    base_url=None)
+
 login_manager = LoginManager(app)
 
 ## CONNECT TO DB
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
-app.config['SQLALCHEMY_DATABASE_URI'] = config.DATABASE_URL1
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = config.DATABASE_URL1
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -162,7 +171,7 @@ def show_post(post_id):
         db.session.add(new_comment)
         db.session.commit()
         return redirect(url_for('show_post', post_id=requested_post.id))
-    return render_template("post.html", post=requested_post, current_user=current_user, form=form, comments=comments, year=date.today().year)
+    return render_template("post.html", post=requested_post, current_user=current_user, form=form, gravatar=gravatar, comments=comments, year=date.today().year)
 
 
 @app.route("/about")
