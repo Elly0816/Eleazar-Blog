@@ -13,9 +13,9 @@ from sqlalchemy import Table, Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 import config
+import smtplib
 
 Base = declarative_base()
-
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = config.SECRET_KEY
@@ -92,8 +92,8 @@ def admin_only(func):
             return func(*args, **kwargs)
         else:
             return abort(401)
-    return wrapper
 
+    return wrapper
 
 
 @login_manager.user_loader
@@ -104,14 +104,14 @@ def load_user(user_id):
 @app.route('/')
 def get_all_posts():
     posts = BlogPost.query.all()
-    
+
     return render_template("index.html", all_posts=posts, current_user=current_user, year=date.today().year)
 
 
 @app.route('/register', methods=["POST", "GET"])
 def register():
     form = RegisterForm()
-    
+
     if request.method == "POST":
         email = request.form.get('email')
         user = User.query.filter_by(email=email).first()
@@ -120,11 +120,11 @@ def register():
             return redirect(url_for('login'))
         else:
             new_user = User(email=email,
-                             password=generate_password_hash(request.form.get('password'),
-                                                             method='pbkdf2:sha256',
-                                                             salt_length=5),
-                             name=request.form.get('name')
-                             )
+                            password=generate_password_hash(request.form.get('password'),
+                                                            method='pbkdf2:sha256',
+                                                            salt_length=5),
+                            name=request.form.get('name')
+                            )
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user, remember=True)
@@ -135,7 +135,7 @@ def register():
 @app.route('/login', methods=["POST", "GET"])
 def login():
     form = LoginForm()
-    
+
     if request.method == "POST":
         user = User.query.filter_by(email=request.form.get('email')).first()
         if user:
@@ -161,28 +161,44 @@ def logout():
 @app.route("/post/<int:post_id>", methods=["GET", "POST"])
 def show_post(post_id):
     form = CommentForm()
-    
     comments = Comment.query.all()
     requested_post = BlogPost.query.get(post_id)
     if form.validate_on_submit():
-        new_comment = Comment(text=request.form.get('comment'),
-                              post_id=requested_post.id,
-                              author_id=current_user.id)
-        db.session.add(new_comment)
-        db.session.commit()
-        return redirect(url_for('show_post', post_id=requested_post.id))
-    return render_template("post.html", post=requested_post, current_user=current_user, form=form, gravatar=gravatar, comments=comments, year=date.today().year)
+        if current_user.is_authenticated:
+            new_comment = Comment(text=request.form.get('comment'),
+                                  post_id=requested_post.id,
+                                  author_id=current_user.id)
+            db.session.add(new_comment)
+            db.session.commit()
+            return redirect(url_for('show_post', post_id=requested_post.id))
+        else:
+            flash("You need to login or register to post a comment!")
+            return redirect(url_for('login'))
+    if requested_post:
+        return render_template("post.html", post=requested_post, current_user=current_user, form=form,
+                               gravatar=gravatar, comments=comments, year=date.today().year)
+    else:
+        return redirect(url_for('get_all_posts'))
 
 
 @app.route("/about")
 def about():
-    
     return render_template("about.html", current_user=current_user, year=date.today().year)
 
 
-@app.route("/contact")
+@app.route("/contact", methods=['GET', 'POST'])
 def contact():
-    
+    name = request.form.get('name')
+    email = request.form.get('email')
+    phone = request.form.get('phone')
+    message = f"Subject: Letter from {name}\n\n{request.form.get('message')}.\nPhone Number:{phone} \nEmail: {email}"
+    if request.method == 'POST':
+        with smtplib.SMTP('smtp.gmail.com', port=587, timeout=120) as connection:
+            connection.starttls()
+            connection.login(user=config.EMAIL, password=config.PASSWORD)
+            connection.sendmail(from_addr=config.EMAIL, to_addrs='elzoremmanuel@gmail.com', msg=message)
+        flash('Email sent!')
+        return redirect(url_for('contact'))
     return render_template("contact.html", current_user=current_user, year=date.today().year)
 
 
@@ -190,7 +206,7 @@ def contact():
 @admin_only
 def add_new_post():
     form = CreatePostForm()
-    
+
     if form.validate_on_submit():
         new_post = BlogPost(
             title=form.title.data,
@@ -209,7 +225,6 @@ def add_new_post():
 @app.route("/edit-post/<int:post_id>", methods=["POST", "GET"])
 @admin_only
 def edit_post(post_id):
-    
     post = BlogPost.query.get(post_id)
     edit_form = CreatePostForm(
         title=post.title,

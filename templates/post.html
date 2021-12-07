@@ -36,14 +36,12 @@
 <!--           Comments Area -->
 
           <div class="col-lg-8 col-md-10 mx-auto comment">
-          {% if current_user.is_authenticated %}
             {{ wtf.quick_form(form, novalidate=True, button_map={ "submit": "primary" }) }}
-          {% endif %}
             <hr>
             {% if comments %}
+              {% for comment in comments %}
+              {% if comment.post_id == post.id %}
               <ul class="commentList">
-                {% for comment in comments %}
-                {% if comment.post_id == post.id %}
                 <div>
                   <li>
                       <div class="commenterImage">
@@ -55,9 +53,9 @@
                       </div>
                   </li>
                 </div>
-                {% endif %}
-                {% endfor %}
               </ul>
+              {% endif %}
+              {% endfor %}
             {% endif %}
             </div>
 
