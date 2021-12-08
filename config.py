@@ -10,4 +10,3 @@ DATABASE_URL1 = os.getenv('DATABASE_URL1', 'sqlite:///blog.db')
 
 EMAIL = os.getenv('SENDER_EMAIL')
 PASSWORD = os.getenv('MY_PASSWORD')
-R_EMAIL = os.getenv('RECEIVER_EMAIL')

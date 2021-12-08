@@ -7,8 +7,12 @@
       <div class="row">
         <div class="col-lg-8 col-md-10 mx-auto">
           <div class="page-heading">
+            {% if sent %}
+            <h1>Message sent Successfully</h1>
+            {% else %}
             <h1>Contact Me</h1>
             <span class="subheading">Have questions? I have answers.</span>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -56,15 +60,6 @@
           <div id="success"></div>
           <button type="submit" class="btn btn-primary" id="sendMessageButton">Send</button>
         </form>
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <ul class="flashes">
-          {% for message in messages %}
-          <li style="color: blue;">{{ message }}</li>
-          {% endfor %}
-        </ul>
-        {% endif %}
-        {% endwith %}
       </div>
     </div>
   </div>

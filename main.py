@@ -188,6 +188,7 @@ def about():
 
 @app.route("/contact", methods=['GET', 'POST'])
 def contact():
+    sent = False
     name = request.form.get('name')
     email = request.form.get('email')
     phone = request.form.get('phone')
@@ -196,17 +197,16 @@ def contact():
         with smtplib.SMTP('smtp.gmail.com', port=587, timeout=120) as connection:
             connection.starttls()
             connection.login(user=config.EMAIL, password=config.PASSWORD)
-            connection.sendmail(from_addr=config.EMAIL, to_addrs=config.R_EMAIL, msg=message.encode('utf-8'))
-        flash('Email sent!')
-        return redirect(url_for('contact'))
-    return render_template("contact.html", current_user=current_user, year=date.today().year)
+            connection.sendmail(from_addr=config.EMAIL, to_addrs='elzoremmanuel@gmail.com', msg=message.encode('utf-8'))
+        sent = True
+        return render_template("contact.html", current_user=current_user, year=date.today().year, sent=sent)
+    return render_template("contact.html", current_user=current_user, year=date.today().year, sent=sent)
 
 
 @app.route("/new-post", methods=["POST", "GET"])
 @admin_only
 def add_new_post():
     form = CreatePostForm()
-
     if form.validate_on_submit():
         new_post = BlogPost(
             title=form.title.data,
