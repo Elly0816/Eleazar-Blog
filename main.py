@@ -33,7 +33,7 @@ gravatar = Gravatar(app,
 login_manager = LoginManager(app)
 
 ## CONNECT TO DB
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = config.DATABASE_URL
 # app.config['SQLALCHEMY_DATABASE_URI'] = config.DATABASE_URL1
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -81,7 +81,6 @@ class User(UserMixin, db.Model):
     comments = relationship("Comment", back_populates="comment_author")
 
 
-# db.create_all()
 
 
 # Decorator function for checking if the logged in user is the admin
@@ -253,4 +252,6 @@ def delete_post(post_id):
 
 
 if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
